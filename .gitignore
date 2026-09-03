@@ -1,0 +1,35 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+.venv-win
+
+# Environment variables (contains API keys!)
+.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# Node.js
+node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Memory data
+memory/games.json
+
+# OS
+.DS_Store
+Thumbs.db
