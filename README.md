@@ -352,6 +352,7 @@ npm run dev
 | [📡 API 文档](docs/api.md) | 接口格式、使用示例 |
 | [🚀 部署指南](docs/deployment.md) | 环境要求、安装步骤 |
 | [💻 开发指南](docs/development.md) | 代码规范、扩展指南 |
+| [📚 LangGraph 教程](docs/langgraph-tutorial.md) | 基于项目学习 LangGraph |
 
 </div>
 

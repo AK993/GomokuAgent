@@ -44,6 +44,13 @@
 - 测试说明
 - 贡献流程
 
+### 7. [LangGraph 教程](langgraph-tutorial.md)
+- LangGraph 核心概念
+- 代码逐行解析
+- 动手实验
+- 进阶功能
+- 最佳实践
+
 ---
 
 ## 快速导航
@@ -54,3 +61,4 @@
 - **想调用 API？** → [API 文档](api.md)
 - **想部署项目？** → [部署指南](deployment.md)
 - **想参与开发？** → [开发指南](development.md)
+- **想学习 LangGraph？** → [LangGraph 教程](langgraph-tutorial.md)
