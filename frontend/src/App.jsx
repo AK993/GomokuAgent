@@ -1,6 +1,7 @@
 import React, {
     useState,
-    useEffect
+    useEffect,
+    useRef
 }
 from "react";
 
@@ -24,6 +25,18 @@ from "./api";
 
 
 function App(){
+
+
+    // Ref for chat messages container
+    const chatEndRef = useRef(null);
+
+
+    // Auto scroll to bottom when new message arrives
+    useEffect(() => {
+        if (chatEndRef.current) {
+            chatEndRef.current.scrollIntoView({ behavior: "smooth" });
+        }
+    }, [chatMessages]);
 
 
 
@@ -841,6 +854,9 @@ function App(){
                                 </div>
                             </div>
                         )}
+
+                        {/* Scroll anchor */}
+                        <div ref={chatEndRef} />
                     </div>
 
 
