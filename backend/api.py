@@ -124,6 +124,13 @@ class ChatRequest(BaseModel):
 
 
 
+class NewGameRequest(BaseModel):
+
+    size: int = 15           # 棋盘大小: 9, 13, 15
+    difficulty: str = "medium"  # 难度: easy, medium, hard
+
+
+
 
 
 
@@ -140,6 +147,43 @@ def board():
 def reset():
     game.reset()
     return game.get_state()
+
+
+@router.post("/new-game")
+def new_game(req: NewGameRequest):
+    """创建新游戏，支持选择棋盘大小和难度"""
+    global game, agent
+
+    # 验证棋盘大小
+    valid_sizes = [9, 13, 15]
+    if req.size not in valid_sizes:
+        return {"error": f"不支持的棋盘大小，可选: {valid_sizes}"}
+
+    # 验证难度
+    valid_difficulties = ["easy", "medium", "hard"]
+    if req.difficulty not in valid_difficulties:
+        return {"error": f"不支持的难度，可选: {valid_difficulties}"}
+
+    # 创建新游戏
+    game = GameManager(size=req.size)
+
+    # 重置 Agent
+    agent = None
+
+    # 保存难度设置
+    difficulty_map = {
+        "easy": 100,
+        "medium": 300,
+        "hard": 500
+    }
+
+    return {
+        **game.get_state(),
+        "size": req.size,
+        "difficulty": req.difficulty,
+        "simulations": difficulty_map[req.difficulty],
+        "message": f"新游戏已创建: {req.size}×{req.size} 棋盘, {req.difficulty} 难度"
+    }
 
 
 
@@ -402,4 +446,77 @@ def agent_status():
         "memory_count": len(memory.games),
         "recent_lessons": memory.get_lessons(3),
         "last_decision": last_ai_decision
+    }
+
+
+@router.get("/export/game/{index}")
+def export_game(index: int = -1, format: str = "json"):
+    """
+    导出指定棋局的棋谱
+
+    参数:
+        index: 棋局索引，默认 -1 表示最后一局
+        format: 导出格式，支持 "json" 或 "sgf"
+    """
+    result = memory.export_game(index, format)
+
+    if result is None:
+        return {"error": "没有可导出的棋局"}
+
+    return {
+        "format": format,
+        "content": result
+    }
+
+
+@router.get("/export/all")
+def export_all_games(format: str = "json"):
+    """
+    导出所有棋局
+
+    参数:
+        format: 导出格式，支持 "json" 或 "sgf"
+    """
+    result = memory.export_all_games(format)
+
+    if result is None:
+        return {"error": "没有可导出的棋局"}
+
+    return {
+        "format": format,
+        "count": len(memory.games),
+        "content": result
+    }
+
+
+@router.get("/game-sizes")
+def get_game_sizes():
+    """获取支持的棋盘大小"""
+    return {
+        "sizes": [9, 13, 15],
+        "default": 15,
+        "descriptions": {
+            9: "9×9 小棋盘 (快速对局)",
+            13: "13×13 中棋盘 (平衡)",
+            15: "15×15 标准棋盘 (经典)"
+        }
+    }
+
+
+@router.get("/difficulties")
+def get_difficulties():
+    """获取支持的难度等级"""
+    return {
+        "difficulties": ["easy", "medium", "hard"],
+        "default": "medium",
+        "simulations": {
+            "easy": 100,
+            "medium": 300,
+            "hard": 500
+        },
+        "descriptions": {
+            "easy": "简单 (100次模拟, 快速响应)",
+            "medium": "中等 (300次模拟, 平衡)",
+            "hard": "困难 (500次模拟, 更强棋力)"
+        }
     }

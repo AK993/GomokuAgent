@@ -12,12 +12,13 @@ from game.tactical import Tactical
 
 def create_mcts_tools(
     board,
-    strategy=None
+    strategy=None,
+    simulations=300
 ):
 
 
     mcts = MCTS(
-        simulations=300
+        simulations=simulations
     )
 
 

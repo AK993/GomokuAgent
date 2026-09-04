@@ -9,10 +9,11 @@ from game.rules import GomokuRules
 class GameManager:
 
 
-    def __init__(self):
+    def __init__(self, size=15):
 
 
-        self.board = Board()
+        self.size = size
+        self.board = Board(size)
 
 
         self.winner = None
@@ -33,7 +34,7 @@ class GameManager:
     def reset(self):
 
 
-        self.board = Board()
+        self.board = Board(self.size)
 
 
         self.winner = None

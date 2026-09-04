@@ -13,7 +13,9 @@ import {
     move,
     getBoard,
     reset,
-    chat
+    newGame,
+    chat,
+    exportGame
 }
 from "./api";
 
@@ -68,6 +70,12 @@ function App(){
     const [chatMessages, setChatMessages] = useState([]);
     const [chatInput, setChatInput] = useState("");
     const [chatLoading, setChatLoading] = useState(false);
+
+    // New game settings
+    const [showNewGame, setShowNewGame] = useState(false);
+    const [selectedSize, setSelectedSize] = useState(15);
+    const [selectedDifficulty, setSelectedDifficulty] = useState("medium");
+    const [gameInfo, setGameInfo] = useState(null);
 
 
 
@@ -381,6 +389,60 @@ function App(){
     }
 
 
+    async function handleNewGame(){
+
+        try{
+
+            const res = await newGame(selectedSize, selectedDifficulty);
+            setBoard(res.data.board);
+            setWinner(null);
+            setWinningLine([]);
+            setLastMove(null);
+            setMessage("");
+            setAiInfo(null);
+            setMoveCount(0);
+            setChatMessages([]);
+            setGameInfo({
+                size: res.data.size,
+                difficulty: res.data.difficulty,
+                simulations: res.data.simulations
+            });
+            setShowNewGame(false);
+
+        }catch(error){
+
+            console.error("创建新游戏失败:", error);
+
+        }
+
+    }
+
+
+    async function handleExport(){
+
+        try{
+
+            const res = await exportGame(-1, "json");
+            const content = res.data.content;
+
+            // 创建下载
+            const blob = new Blob([content], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `gomoku-game-${Date.now()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+
+        }catch(error){
+
+            console.error("导出失败:", error);
+
+        }
+
+    }
+
+
 
 
 
@@ -585,7 +647,7 @@ function App(){
 
                     {/* Restart Button */}
                     <button
-                        onClick={restart}
+                        onClick={() => setShowNewGame(true)}
                         style={{
                             width: "100%",
                             padding: "14px",
@@ -610,6 +672,44 @@ function App(){
                     >
                         New Game
                     </button>
+
+
+                    {/* Export Button */}
+                    <button
+                        onClick={handleExport}
+                        style={{
+                            width: "100%",
+                            padding: "12px",
+                            background: "linear-gradient(135deg, #11998e 0%, #38ef7d 100%)",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "8px",
+                            fontSize: "14px",
+                            fontWeight: "600",
+                            cursor: "pointer",
+                            marginTop: "10px",
+                            transition: "transform 0.2s"
+                        }}
+                    >
+                        Export Game
+                    </button>
+
+
+                    {/* Game Info */}
+                    {gameInfo && (
+                        <div style={{
+                            marginTop: "12px",
+                            padding: "10px",
+                            background: "#e8f5e9",
+                            borderRadius: "8px",
+                            fontSize: "12px",
+                            color: "#2e7d32"
+                        }}>
+                            <div>Board: {gameInfo.size}x{gameInfo.size}</div>
+                            <div>Difficulty: {gameInfo.difficulty}</div>
+                            <div>Simulations: {gameInfo.simulations}</div>
+                        </div>
+                    )}
 
 
 
@@ -786,6 +886,154 @@ function App(){
                 </div>
 
             </div>
+
+
+            {/* New Game Modal */}
+            {showNewGame && (
+                <div style={{
+                    position: "fixed",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: "rgba(0,0,0,0.5)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    zIndex: 1000
+                }}>
+                    <div style={{
+                        background: "white",
+                        borderRadius: "16px",
+                        padding: "32px",
+                        width: "400px",
+                        boxShadow: "0 20px 60px rgba(0,0,0,0.3)"
+                    }}>
+                        <h2 style={{
+                            margin: "0 0 24px 0",
+                            fontSize: "24px",
+                            color: "#333"
+                        }}>
+                            New Game Settings
+                        </h2>
+
+
+                        {/* Board Size */}
+                        <div style={{marginBottom: "20px"}}>
+                            <label style={{
+                                display: "block",
+                                marginBottom: "8px",
+                                fontWeight: "600",
+                                color: "#555"
+                            }}>
+                                Board Size
+                            </label>
+                            <div style={{display: "flex", gap: "10px"}}>
+                                {[9, 13, 15].map(size => (
+                                    <button
+                                        key={size}
+                                        onClick={() => setSelectedSize(size)}
+                                        style={{
+                                            flex: 1,
+                                            padding: "12px",
+                                            background: selectedSize === size
+                                                ? "linear-gradient(135deg, #667eea, #764ba2)"
+                                                : "#f0f0f0",
+                                            color: selectedSize === size ? "white" : "#333",
+                                            border: "none",
+                                            borderRadius: "8px",
+                                            cursor: "pointer",
+                                            fontSize: "14px",
+                                            fontWeight: "600"
+                                        }}
+                                    >
+                                        {size}x{size}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+
+                        {/* Difficulty */}
+                        <div style={{marginBottom: "24px"}}>
+                            <label style={{
+                                display: "block",
+                                marginBottom: "8px",
+                                fontWeight: "600",
+                                color: "#555"
+                            }}>
+                                Difficulty
+                            </label>
+                            <div style={{display: "flex", gap: "10px"}}>
+                                {["easy", "medium", "hard"].map(diff => (
+                                    <button
+                                        key={diff}
+                                        onClick={() => setSelectedDifficulty(diff)}
+                                        style={{
+                                            flex: 1,
+                                            padding: "12px",
+                                            background: selectedDifficulty === diff
+                                                ? diff === "easy"
+                                                    ? "linear-gradient(135deg, #11998e, #38ef7d)"
+                                                    : diff === "medium"
+                                                        ? "linear-gradient(135deg, #667eea, #764ba2)"
+                                                        : "linear-gradient(135deg, #eb3349, #f45c43)"
+                                                : "#f0f0f0",
+                                            color: selectedDifficulty === diff ? "white" : "#333",
+                                            border: "none",
+                                            borderRadius: "8px",
+                                            cursor: "pointer",
+                                            fontSize: "14px",
+                                            fontWeight: "600",
+                                            textTransform: "capitalize"
+                                        }}
+                                    >
+                                        {diff}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+
+                        {/* Buttons */}
+                        <div style={{display: "flex", gap: "12px"}}>
+                            <button
+                                onClick={() => setShowNewGame(false)}
+                                style={{
+                                    flex: 1,
+                                    padding: "14px",
+                                    background: "#f0f0f0",
+                                    color: "#333",
+                                    border: "none",
+                                    borderRadius: "8px",
+                                    cursor: "pointer",
+                                    fontSize: "16px",
+                                    fontWeight: "600"
+                                }}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleNewGame}
+                                style={{
+                                    flex: 1,
+                                    padding: "14px",
+                                    background: "linear-gradient(135deg, #667eea, #764ba2)",
+                                    color: "white",
+                                    border: "none",
+                                    borderRadius: "8px",
+                                    cursor: "pointer",
+                                    fontSize: "16px",
+                                    fontWeight: "600"
+                                }}
+                            >
+                                Start Game
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            )}
 
         </div>
 
