@@ -31,14 +31,6 @@ function App(){
     const chatEndRef = useRef(null);
 
 
-    // Auto scroll to bottom when new message arrives
-    useEffect(() => {
-        if (chatEndRef.current) {
-            chatEndRef.current.scrollIntoView({ behavior: "smooth" });
-        }
-    }, [chatMessages]);
-
-
 
     const empty =
 
@@ -83,6 +75,15 @@ function App(){
     const [chatMessages, setChatMessages] = useState([]);
     const [chatInput, setChatInput] = useState("");
     const [chatLoading, setChatLoading] = useState(false);
+
+
+    // Auto scroll to bottom when new message arrives
+    useEffect(() => {
+        if (chatEndRef.current) {
+            chatEndRef.current.scrollIntoView({ behavior: "smooth" });
+        }
+    }, [chatMessages]);
+
 
     // New game settings
     const [showNewGame, setShowNewGame] = useState(false);
