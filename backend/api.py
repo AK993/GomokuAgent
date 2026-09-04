@@ -520,3 +520,29 @@ def get_difficulties():
             "hard": "困难 (500次模拟, 更强棋力)"
         }
     }
+
+
+@router.get("/openings")
+def get_openings():
+    """获取所有开局库"""
+    from game.opening import OpeningBook
+    book = OpeningBook()
+
+    return {
+        "count": len(book.get_all_openings()),
+        "openings": book.get_all_openings()
+    }
+
+
+@router.get("/opening/current")
+def get_current_opening():
+    """获取当前开局名称"""
+    from game.opening import OpeningBook
+    book = OpeningBook()
+
+    opening_name = book.get_opening_name(game.board.history)
+
+    return {
+        "opening": opening_name,
+        "move_count": len(game.board.history)
+    }

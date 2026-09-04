@@ -7,6 +7,9 @@ from mcts.search import MCTS
 from game.tactical import Tactical
 
 
+from game.opening import OpeningBook
+
+
 
 
 
@@ -25,6 +28,9 @@ def create_mcts_tools(
     tactical = Tactical()
 
 
+    opening_book = OpeningBook()
+
+
 
 
 
@@ -35,9 +41,10 @@ def create_mcts_tools(
         五子棋AI落子
 
         优先:
-        1. 必胜
-        2. 必堵
-        3. MCTS搜索
+        1. 开局库
+        2. 必胜
+        3. 必堵
+        4. MCTS搜索
 
         返回推荐的落子位置，由调用方决定是否落子
 
@@ -61,6 +68,31 @@ def create_mcts_tools(
 
         )
 
+
+
+
+
+
+
+        # =====================
+        # 0. 开局库
+        # =====================
+
+        # 开局阶段（前10步）优先使用开局库
+        if len(board.history) < 10:
+            opening_move = opening_book.find_opening(
+                board.history,
+                player
+            )
+
+            if opening_move:
+                x, y = opening_move
+
+                return {
+                    "move": [x, y],
+                    "type": "opening",
+                    "message": f"开局库落子 ({x},{y})"
+                }
 
 
 
