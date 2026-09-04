@@ -19,18 +19,25 @@ winner
 }){
 
 
-const size = 15;
-const cell = 40;
+// 动态计算棋盘大小
+const size = board.length;
+const cell = size <= 9 ? 50 : size <= 13 ? 44 : 40;
 const padding = 20;
 const boardSize = (size - 1) * cell + padding * 2;
 
 
-// 星位坐标（天元和四个角星）
-const starPoints = [
-    [3, 3], [3, 11],   // 左上、右上
-    [7, 7],            // 天元
-    [11, 3], [11, 11]  // 左下、右下
-];
+// 星位坐标（根据棋盘大小动态计算）
+const getStarPoints = (boardSize) => {
+    if (boardSize === 9) {
+        return [[2, 2], [2, 6], [4, 4], [6, 2], [6, 6]];
+    } else if (boardSize === 13) {
+        return [[3, 3], [3, 9], [6, 6], [9, 3], [9, 9]];
+    } else {
+        return [[3, 3], [3, 11], [7, 7], [11, 3], [11, 11]];
+    }
+};
+
+const starPoints = getStarPoints(size);
 
 function isStarPoint(x, y) {
     return starPoints.some(([sx, sy]) => sx === x && sy === y);
@@ -56,7 +63,7 @@ function click(e){
 
 
 
-    if(x >= 0 && x < 15 && y >= 0 && y < 15){
+    if(x >= 0 && x < size && y >= 0 && y < size){
 
         onMove(x, y);
 
