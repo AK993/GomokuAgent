@@ -17,7 +17,8 @@ import {
     newGame,
     chat,
     exportGame,
-    runSelfPlay
+    runSelfPlay,
+    getMonitorStatus
 }
 from "./api";
 
@@ -97,6 +98,11 @@ function App(){
     const [trainingGames, setTrainingGames] = useState(10);
     const [training, setTraining] = useState(false);
     const [trainingResults, setTrainingResults] = useState(null);
+
+    // Monitor
+    const [showMonitor, setShowMonitor] = useState(false);
+    const [monitorData, setMonitorData] = useState(null);
+    const [monitorInterval, setMonitorInterval] = useState(null);
 
 
 
@@ -487,6 +493,45 @@ function App(){
     }
 
 
+    // Monitor functions
+    const fetchMonitorData = async () => {
+        try {
+            const res = await getMonitorStatus();
+            setMonitorData(res.data);
+        } catch (error) {
+            console.error("获取监控数据失败:", error);
+        }
+    };
+
+
+    const startMonitor = () => {
+        setShowMonitor(true);
+        fetchMonitorData();
+        const interval = setInterval(fetchMonitorData, 1000);
+        setMonitorInterval(interval);
+    };
+
+
+    const stopMonitor = () => {
+        setShowMonitor(false);
+        if (monitorInterval) {
+            clearInterval(monitorInterval);
+            setMonitorInterval(null);
+        }
+        setMonitorData(null);
+    };
+
+
+    // Cleanup monitor on unmount
+    useEffect(() => {
+        return () => {
+            if (monitorInterval) {
+                clearInterval(monitorInterval);
+            }
+        };
+    }, [monitorInterval]);
+
+
 
 
 
@@ -760,6 +805,29 @@ function App(){
                     </button>
 
 
+                    {/* Monitor Toggle Button */}
+                    <button
+                        onClick={showMonitor ? stopMonitor : startMonitor}
+                        style={{
+                            width: "100%",
+                            padding: "12px",
+                            background: showMonitor
+                                ? "linear-gradient(135deg, #f44336, #e91e63)"
+                                : "linear-gradient(135deg, #00b09b, #96c93d)",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "8px",
+                            fontSize: "14px",
+                            fontWeight: "600",
+                            cursor: "pointer",
+                            marginTop: "10px",
+                            transition: "transform 0.2s"
+                        }}
+                    >
+                        {showMonitor ? "Stop Monitor" : "Start Monitor"}
+                    </button>
+
+
                     {/* Game Info */}
                     {gameInfo && (
                         <div style={{
@@ -952,6 +1020,132 @@ function App(){
                     </div>
 
                 </div>
+
+
+                {/* Monitor Panel */}
+                {showMonitor && monitorData && (
+                    <div style={{
+                        background: "rgba(255,255,255,0.95)",
+                        borderRadius: "16px",
+                        padding: "24px",
+                        width: "320px",
+                        boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
+                        backdropFilter: "blur(10px)",
+                        display: "flex",
+                        flexDirection: "column",
+                        height: "500px"
+                    }}>
+
+                        {/* Monitor Header */}
+                        <div style={{
+                            background: "linear-gradient(135deg, #00b09b 0%, #96c93d 100%)",
+                            borderRadius: "12px",
+                            padding: "16px",
+                            marginBottom: "16px",
+                            color: "white"
+                        }}>
+                            <div style={{fontSize: "18px", fontWeight: "600"}}>
+                                AI Monitor
+                            </div>
+                            <div style={{fontSize: "12px", opacity: 0.9, marginTop: "4px"}}>
+                                Real-time AI thinking process
+                            </div>
+                        </div>
+
+
+                        {/* Monitor Content */}
+                        <div style={{
+                            flex: 1,
+                            overflowY: "auto",
+                            fontSize: "13px"
+                        }}>
+                            {/* Game Status */}
+                            <div style={{
+                                marginBottom: "16px",
+                                padding: "12px",
+                                background: monitorData.game_over ? "#ffebee" : "#e8f5e9",
+                                borderRadius: "8px"
+                            }}>
+                                <div style={{fontWeight: "600", marginBottom: "8px"}}>
+                                    Game Status
+                                </div>
+                                <div>Status: {monitorData.game_over ? "Game Over" : "Playing"}</div>
+                                <div>Current Player: {monitorData.current_player}</div>
+                                <div>Moves: {monitorData.move_count}</div>
+                                {monitorData.opening && (
+                                    <div>Opening: {monitorData.opening}</div>
+                                )}
+                            </div>
+
+
+                            {/* Score Analysis */}
+                            <div style={{
+                                marginBottom: "16px",
+                                padding: "12px",
+                                background: "#f5f5f5",
+                                borderRadius: "8px"
+                            }}>
+                                <div style={{fontWeight: "600", marginBottom: "8px"}}>
+                                    Score Analysis
+                                </div>
+                                <div>Current Score: {monitorData.scores.current}</div>
+                                <div>Opponent Score: {monitorData.scores.opponent}</div>
+                                <div>Situation: {monitorData.situation}</div>
+                            </div>
+
+
+                            {/* AI Decision */}
+                            {monitorData.ai_decision && monitorData.ai_decision.strategy && (
+                                <div style={{
+                                    marginBottom: "16px",
+                                    padding: "12px",
+                                    background: "#e3f2fd",
+                                    borderRadius: "8px"
+                                }}>
+                                    <div style={{fontWeight: "600", marginBottom: "8px"}}>
+                                        AI Thinking
+                                    </div>
+                                    <div>Style: {monitorData.ai_decision.strategy.style}</div>
+                                    <div>Priority: {monitorData.ai_decision.strategy.priority}</div>
+                                    {monitorData.ai_decision.strategy.reason && (
+                                        <div>Reason: {monitorData.ai_decision.strategy.reason}</div>
+                                    )}
+                                </div>
+                            )}
+
+
+                            {/* Last Move */}
+                            {monitorData.last_move && (
+                                <div style={{
+                                    marginBottom: "16px",
+                                    padding: "12px",
+                                    background: "#fff3e0",
+                                    borderRadius: "8px"
+                                }}>
+                                    <div style={{fontWeight: "600", marginBottom: "8px"}}>
+                                        Last Move
+                                    </div>
+                                    <div>Position: ({monitorData.last_move.x}, {monitorData.last_move.y})</div>
+                                    <div>Player: {monitorData.last_move.player === 1 ? "Black" : "White"}</div>
+                                </div>
+                            )}
+
+
+                            {/* Memory Stats */}
+                            <div style={{
+                                padding: "12px",
+                                background: "#f3e5f5",
+                                borderRadius: "8px"
+                            }}>
+                                <div style={{fontWeight: "600", marginBottom: "8px"}}>
+                                    Memory Stats
+                                </div>
+                                <div>Saved Games: {monitorData.memory_count}</div>
+                            </div>
+                        </div>
+
+                    </div>
+                )}
 
             </div>
 

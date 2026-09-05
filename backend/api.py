@@ -599,3 +599,53 @@ def get_self_play_stats():
     stats = trainer.get_training_stats()
 
     return stats
+
+
+@router.get("/monitor")
+def get_monitor_status():
+    """获取监控状态（实时）"""
+    from game.rules import GomokuRules
+    from game.evaluator import GomokuEvaluator
+    from game.opening import OpeningBook
+
+    evaluator = GomokuEvaluator()
+    opening_book = OpeningBook()
+
+    board = game.board
+    player = board.current_player
+    enemy = board.BLACK if player == board.WHITE else board.WHITE
+
+    # 计算双方得分
+    my_score = evaluator.evaluate_player(board, player)
+    enemy_score = evaluator.evaluate_player(board, enemy)
+
+    # 判断局势
+    if my_score > enemy_score * 1.5:
+        situation = "advantage"
+    elif enemy_score > my_score * 1.5:
+        situation = "disadvantage"
+    else:
+        situation = "balanced"
+
+    # 获取开局名称
+    opening_name = opening_book.get_opening_name(board.history)
+
+    # 获取最近落子
+    last_move = board.history[-1] if board.history else None
+
+    return {
+        "board": board.board,
+        "current_player": "Black" if player == board.BLACK else "White",
+        "game_over": game.game_over,
+        "winner": game.winner,
+        "move_count": len(board.history),
+        "last_move": last_move,
+        "opening": opening_name,
+        "scores": {
+            "current": my_score,
+            "opponent": enemy_score
+        },
+        "situation": situation,
+        "ai_decision": last_ai_decision,
+        "memory_count": len(memory.games)
+    }

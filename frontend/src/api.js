@@ -142,3 +142,12 @@ export function getSelfPlayStats(){
     );
 
 }
+
+
+export function getMonitorStatus(){
+
+    return API.get(
+        "/monitor"
+    );
+
+}
