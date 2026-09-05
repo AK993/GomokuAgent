@@ -119,3 +119,26 @@ export function getDifficulties(){
     );
 
 }
+
+
+export function runSelfPlay(numGames = 10, boardSize = 15, simulations = 300){
+
+    return API.post(
+        "/self-play",
+        {
+            num_games: numGames,
+            board_size: boardSize,
+            simulations: simulations
+        }
+    );
+
+}
+
+
+export function getSelfPlayStats(){
+
+    return API.get(
+        "/self-play/stats"
+    );
+
+}

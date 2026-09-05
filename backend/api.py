@@ -546,3 +546,56 @@ def get_current_opening():
         "opening": opening_name,
         "move_count": len(game.board.history)
     }
+
+
+class SelfPlayRequest(BaseModel):
+    num_games: int = 10
+    board_size: int = 15
+    simulations: int = 300
+
+
+@router.post("/self-play")
+def run_self_play(req: SelfPlayRequest):
+    """
+    运行 AI 自我对弈训练
+
+    参数:
+        num_games: 对局数量
+        board_size: 棋盘大小
+        simulations: MCTS 模拟次数
+    """
+    from tools.self_play import run_training
+
+    # 验证参数
+    if req.num_games < 1 or req.num_games > 100:
+        return {"error": "对局数量必须在 1-100 之间"}
+
+    if req.board_size not in [9, 13, 15]:
+        return {"error": "棋盘大小必须是 9, 13 或 15"}
+
+    if req.simulations < 50 or req.simulations > 1000:
+        return {"error": "模拟次数必须在 50-1000 之间"}
+
+    # 运行训练
+    results = run_training(
+        num_games=req.num_games,
+        board_size=req.board_size,
+        simulations=req.simulations,
+        verbose=False
+    )
+
+    return {
+        "success": True,
+        "results": results
+    }
+
+
+@router.get("/self-play/stats")
+def get_self_play_stats():
+    """获取自我对弈训练统计"""
+    from tools.self_play import SelfPlay
+
+    trainer = SelfPlay()
+    stats = trainer.get_training_stats()
+
+    return stats

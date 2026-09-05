@@ -16,7 +16,8 @@ import {
     reset,
     newGame,
     chat,
-    exportGame
+    exportGame,
+    runSelfPlay
 }
 from "./api";
 
@@ -90,6 +91,12 @@ function App(){
     const [selectedSize, setSelectedSize] = useState(15);
     const [selectedDifficulty, setSelectedDifficulty] = useState("medium");
     const [gameInfo, setGameInfo] = useState(null);
+
+    // Self play training
+    const [showTraining, setShowTraining] = useState(false);
+    const [trainingGames, setTrainingGames] = useState(10);
+    const [training, setTraining] = useState(false);
+    const [trainingResults, setTrainingResults] = useState(null);
 
 
 
@@ -457,6 +464,29 @@ function App(){
     }
 
 
+    async function handleSelfPlay(){
+
+        setTraining(true);
+        setTrainingResults(null);
+
+        try{
+
+            const res = await runSelfPlay(trainingGames, selectedSize, 300);
+            setTrainingResults(res.data.results);
+
+        }catch(error){
+
+            console.error("训练失败:", error);
+
+        }finally{
+
+            setTraining(false);
+
+        }
+
+    }
+
+
 
 
 
@@ -709,6 +739,27 @@ function App(){
                     </button>
 
 
+                    {/* Self Play Button */}
+                    <button
+                        onClick={() => setShowTraining(true)}
+                        style={{
+                            width: "100%",
+                            padding: "12px",
+                            background: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "8px",
+                            fontSize: "14px",
+                            fontWeight: "600",
+                            cursor: "pointer",
+                            marginTop: "10px",
+                            transition: "transform 0.2s"
+                        }}
+                    >
+                        AI Training
+                    </button>
+
+
                     {/* Game Info */}
                     {gameInfo && (
                         <div style={{
@@ -903,6 +954,187 @@ function App(){
                 </div>
 
             </div>
+
+
+            {/* Training Modal */}
+            {showTraining && (
+                <div style={{
+                    position: "fixed",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: "rgba(0,0,0,0.5)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    zIndex: 1000
+                }}>
+                    <div style={{
+                        background: "white",
+                        borderRadius: "16px",
+                        padding: "32px",
+                        width: "450px",
+                        boxShadow: "0 20px 60px rgba(0,0,0,0.3)"
+                    }}>
+                        <h2 style={{
+                            margin: "0 0 24px 0",
+                            fontSize: "24px",
+                            color: "#333"
+                        }}>
+                            AI Self-Play Training
+                        </h2>
+
+
+                        {/* Number of Games */}
+                        <div style={{marginBottom: "20px"}}>
+                            <label style={{
+                                display: "block",
+                                marginBottom: "8px",
+                                fontWeight: "600",
+                                color: "#555"
+                            }}>
+                                Number of Games
+                            </label>
+                            <div style={{display: "flex", gap: "10px"}}>
+                                {[5, 10, 20, 50].map(num => (
+                                    <button
+                                        key={num}
+                                        onClick={() => setTrainingGames(num)}
+                                        style={{
+                                            flex: 1,
+                                            padding: "12px",
+                                            background: trainingGames === num
+                                                ? "linear-gradient(135deg, #f093fb, #f5576c)"
+                                                : "#f0f0f0",
+                                            color: trainingGames === num ? "white" : "#333",
+                                            border: "none",
+                                            borderRadius: "8px",
+                                            cursor: "pointer",
+                                            fontSize: "14px",
+                                            fontWeight: "600"
+                                        }}
+                                    >
+                                        {num}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+
+                        {/* Training Status */}
+                        {training && (
+                            <div style={{
+                                marginBottom: "20px",
+                                padding: "16px",
+                                background: "#fff3e0",
+                                borderRadius: "8px",
+                                textAlign: "center"
+                            }}>
+                                <div style={{
+                                    fontSize: "16px",
+                                    fontWeight: "600",
+                                    color: "#e65100"
+                                }}>
+                                    Training in progress...
+                                </div>
+                                <div style={{
+                                    fontSize: "14px",
+                                    color: "#bf360c",
+                                    marginTop: "8px"
+                                }}>
+                                    Playing {trainingGames} games
+                                </div>
+                            </div>
+                        )}
+
+
+                        {/* Training Results */}
+                        {trainingResults && !training && (
+                            <div style={{
+                                marginBottom: "20px",
+                                padding: "16px",
+                                background: "#e8f5e9",
+                                borderRadius: "8px"
+                            }}>
+                                <div style={{
+                                    fontSize: "16px",
+                                    fontWeight: "600",
+                                    color: "#2e7d32",
+                                    marginBottom: "12px"
+                                }}>
+                                    Training Complete!
+                                </div>
+
+                                <div style={{display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px"}}>
+                                    <div>
+                                        <span style={{color: "#666"}}>Black Wins: </span>
+                                        <span style={{fontWeight: "600"}}>{trainingResults.black_wins}</span>
+                                    </div>
+                                    <div>
+                                        <span style={{color: "#666"}}>White Wins: </span>
+                                        <span style={{fontWeight: "600"}}>{trainingResults.white_wins}</span>
+                                    </div>
+                                    <div>
+                                        <span style={{color: "#666"}}>Draws: </span>
+                                        <span style={{fontWeight: "600"}}>{trainingResults.draws}</span>
+                                    </div>
+                                    <div>
+                                        <span style={{color: "#666"}}>Avg Moves: </span>
+                                        <span style={{fontWeight: "600"}}>
+                                            {trainingResults.total_moves / trainingGames}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+
+                        {/* Buttons */}
+                        <div style={{display: "flex", gap: "12px"}}>
+                            <button
+                                onClick={() => {
+                                    setShowTraining(false);
+                                    setTrainingResults(null);
+                                }}
+                                style={{
+                                    flex: 1,
+                                    padding: "14px",
+                                    background: "#f0f0f0",
+                                    color: "#333",
+                                    border: "none",
+                                    borderRadius: "8px",
+                                    cursor: "pointer",
+                                    fontSize: "16px",
+                                    fontWeight: "600"
+                                }}
+                            >
+                                Close
+                            </button>
+                            <button
+                                onClick={handleSelfPlay}
+                                disabled={training}
+                                style={{
+                                    flex: 1,
+                                    padding: "14px",
+                                    background: training
+                                        ? "#ccc"
+                                        : "linear-gradient(135deg, #f093fb, #f5576c)",
+                                    color: "white",
+                                    border: "none",
+                                    borderRadius: "8px",
+                                    cursor: training ? "not-allowed" : "pointer",
+                                    fontSize: "16px",
+                                    fontWeight: "600"
+                                }}
+                            >
+                                {training ? "Training..." : "Start Training"}
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            )}
 
 
             {/* New Game Modal */}
