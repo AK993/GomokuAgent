@@ -543,57 +543,243 @@ function App(){
 
         <div style={{
             minHeight: "100vh",
-            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+            background: "linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)",
             display: "flex",
             flexDirection: "column",
-            alignItems: "center",
-            padding: "20px",
             fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
         }}>
 
             {/* Header */}
             <div style={{
                 textAlign: "center",
-                marginBottom: "24px",
+                padding: "20px 0",
                 color: "white"
             }}>
                 <h1 style={{
                     margin: "0 0 8px 0",
-                    fontSize: "36px",
+                    fontSize: "32px",
                     fontWeight: "700",
-                    textShadow: "2px 2px 4px rgba(0,0,0,0.3)",
-                    letterSpacing: "2px"
+                    textShadow: "2px 2px 4px rgba(0,0,0,0.5)",
+                    letterSpacing: "3px"
                 }}>
-                    Gomoku Agent
+                    GOMOKU AGENT
                 </h1>
                 <p style={{
                     margin: 0,
-                    fontSize: "16px",
-                    opacity: 0.9
+                    fontSize: "14px",
+                    opacity: 0.7,
+                    letterSpacing: "1px"
                 }}>
-                    LangGraph + MCTS AI
+                    LangGraph + MCTS + LLM
                 </p>
             </div>
 
 
 
-            {/* Main Content */}
+            {/* Main Content - Centered */}
             <div style={{
+                flex: 1,
                 display: "flex",
-                gap: "32px",
+                justifyContent: "center",
                 alignItems: "flex-start",
-                flexWrap: "wrap",
-                justifyContent: "center"
+                padding: "0 20px 20px",
+                gap: "24px"
             }}>
 
 
 
-                {/* Board Container */}
+                {/* Left Panel - Controls */}
+                <div style={{
+                    width: "200px",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "12px"
+                }}>
+                    {/* Action Buttons */}
+                    <div style={{
+                        background: "rgba(255,255,255,0.1)",
+                        borderRadius: "12px",
+                        padding: "16px",
+                        backdropFilter: "blur(10px)"
+                    }}>
+                        <div style={{
+                            fontSize: "12px",
+                            color: "rgba(255,255,255,0.6)",
+                            marginBottom: "12px",
+                            textTransform: "uppercase",
+                            letterSpacing: "1px"
+                        }}>
+                            Actions
+                        </div>
+
+                        <button
+                            onClick={() => setShowNewGame(true)}
+                            style={{
+                                width: "100%",
+                                padding: "10px",
+                                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                                color: "white",
+                                border: "none",
+                                borderRadius: "8px",
+                                fontSize: "13px",
+                                fontWeight: "600",
+                                cursor: "pointer",
+                                marginBottom: "8px"
+                            }}
+                        >
+                            New Game
+                        </button>
+
+                        <button
+                            onClick={restart}
+                            style={{
+                                width: "100%",
+                                padding: "10px",
+                                background: "rgba(255,255,255,0.2)",
+                                color: "white",
+                                border: "none",
+                                borderRadius: "8px",
+                                fontSize: "13px",
+                                fontWeight: "600",
+                                cursor: "pointer",
+                                marginBottom: "8px"
+                            }}
+                        >
+                            Reset
+                        </button>
+
+                        <button
+                            onClick={handleExport}
+                            style={{
+                                width: "100%",
+                                padding: "10px",
+                                background: "linear-gradient(135deg, #11998e 0%, #38ef7d 100%)",
+                                color: "white",
+                                border: "none",
+                                borderRadius: "8px",
+                                fontSize: "13px",
+                                fontWeight: "600",
+                                cursor: "pointer",
+                                marginBottom: "8px"
+                            }}
+                        >
+                            Export
+                        </button>
+
+                        <button
+                            onClick={() => setShowTraining(true)}
+                            style={{
+                                width: "100%",
+                                padding: "10px",
+                                background: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
+                                color: "white",
+                                border: "none",
+                                borderRadius: "8px",
+                                fontSize: "13px",
+                                fontWeight: "600",
+                                cursor: "pointer",
+                                marginBottom: "8px"
+                            }}
+                        >
+                            Training
+                        </button>
+
+                        <button
+                            onClick={showMonitor ? stopMonitor : startMonitor}
+                            style={{
+                                width: "100%",
+                                padding: "10px",
+                                background: showMonitor
+                                    ? "linear-gradient(135deg, #f44336, #e91e63)"
+                                    : "linear-gradient(135deg, #00b09b, #96c93d)",
+                                color: "white",
+                                border: "none",
+                                borderRadius: "8px",
+                                fontSize: "13px",
+                                fontWeight: "600",
+                                cursor: "pointer"
+                            }}
+                        >
+                            {showMonitor ? "Stop Monitor" : "Monitor"}
+                        </button>
+                    </div>
+
+                    {/* Game Info */}
+                    {gameInfo && (
+                        <div style={{
+                            background: "rgba(255,255,255,0.1)",
+                            borderRadius: "12px",
+                            padding: "16px",
+                            backdropFilter: "blur(10px)"
+                        }}>
+                            <div style={{
+                                fontSize: "12px",
+                                color: "rgba(255,255,255,0.6)",
+                                marginBottom: "8px",
+                                textTransform: "uppercase",
+                                letterSpacing: "1px"
+                            }}>
+                                Game Settings
+                            </div>
+                            <div style={{color: "white", fontSize: "13px"}}>
+                                <div>Board: {gameInfo.size}x{gameInfo.size}</div>
+                                <div>Difficulty: {gameInfo.difficulty}</div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Legend */}
+                    <div style={{
+                        background: "rgba(255,255,255,0.1)",
+                        borderRadius: "12px",
+                        padding: "16px",
+                        backdropFilter: "blur(10px)"
+                    }}>
+                        <div style={{
+                            fontSize: "12px",
+                            color: "rgba(255,255,255,0.6)",
+                            marginBottom: "12px",
+                            textTransform: "uppercase",
+                            letterSpacing: "1px"
+                        }}>
+                            Legend
+                        </div>
+                        <div style={{display: "flex", alignItems: "center", marginBottom: "8px"}}>
+                            <div style={{
+                                width: "14px", height: "14px", borderRadius: "50%",
+                                background: "radial-gradient(circle at 35% 35%, #555, #000)",
+                                marginRight: "8px", border: "1px solid rgba(255,255,255,0.3)"
+                            }}></div>
+                            <span style={{color: "white", fontSize: "12px"}}>You (Black)</span>
+                        </div>
+                        <div style={{display: "flex", alignItems: "center", marginBottom: "8px"}}>
+                            <div style={{
+                                width: "14px", height: "14px", borderRadius: "50%",
+                                background: "radial-gradient(circle at 35% 35%, #fff, #ddd)",
+                                marginRight: "8px", border: "1px solid rgba(255,255,255,0.3)"
+                            }}></div>
+                            <span style={{color: "white", fontSize: "12px"}}>AI (White)</span>
+                        </div>
+                        <div style={{display: "flex", alignItems: "center"}}>
+                            <div style={{
+                                width: "14px", height: "14px", borderRadius: "50%",
+                                background: "transparent",
+                                marginRight: "8px",
+                                border: "3px solid #FF4444"
+                            }}></div>
+                            <span style={{color: "white", fontSize: "12px"}}>Winning</span>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                {/* Center - Board */}
                 <div style={{
                     background: "rgba(255,255,255,0.95)",
                     borderRadius: "16px",
-                    padding: "24px",
-                    boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
+                    padding: "20px",
+                    boxShadow: "0 20px 60px rgba(0,0,0,0.4)",
                     backdropFilter: "blur(10px)"
                 }}>
                     <GomokuBoard
@@ -608,544 +794,241 @@ function App(){
 
 
 
-                {/* Info Panel */}
+                {/* Right Panel - Status & Chat */}
                 <div style={{
-                    background: "rgba(255,255,255,0.95)",
-                    borderRadius: "16px",
-                    padding: "24px",
                     width: "280px",
-                    boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
-                    backdropFilter: "blur(10px)"
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "12px"
                 }}>
-
                     {/* Game Status */}
                     <div style={{
-                        background: winner
-                            ? (winner === 1 ? "linear-gradient(135deg, #FFD700, #FFA500)" : "linear-gradient(135deg, #FF6B6B, #FF4444)")
-                            : thinking
-                                ? "linear-gradient(135deg, #4ECDC4, #44BD9E)"
-                                : "linear-gradient(135deg, #667eea, #764ba2)",
+                        background: "rgba(255,255,255,0.1)",
                         borderRadius: "12px",
-                        padding: "20px",
-                        textAlign: "center",
-                        marginBottom: "20px",
-                        color: "white",
-                        minHeight: "80px",
-                        display: "flex",
-                        flexDirection: "column",
-                        justifyContent: "center"
+                        padding: "16px",
+                        backdropFilter: "blur(10px)"
                     }}>
                         <div style={{
-                            fontSize: "24px",
-                            fontWeight: "bold",
-                            marginBottom: "8px"
+                            fontSize: "12px",
+                            color: "rgba(255,255,255,0.6)",
+                            marginBottom: "12px",
+                            textTransform: "uppercase",
+                            letterSpacing: "1px"
                         }}>
-                            {winner
-                                ? (winner === 1 ? "You Win!" : "AI Wins!")
+                            Status
+                        </div>
+
+                        <div style={{
+                            background: winner
+                                ? (winner === 1 ? "linear-gradient(135deg, #FFD700, #FFA500)" : "linear-gradient(135deg, #FF6B6B, #FF4444)")
                                 : thinking
-                                    ? "Thinking..."
-                                    : "Your Turn"
-                            }
-                        </div>
-                        {message && !winner && (
-                            <div style={{fontSize: "14px", opacity: 0.9}}>
-                                {message}
+                                    ? "linear-gradient(135deg, #4ECDC4, #44BD9E)"
+                                    : "linear-gradient(135deg, #667eea, #764ba2)",
+                            borderRadius: "8px",
+                            padding: "16px",
+                            textAlign: "center",
+                            color: "white",
+                            minHeight: "60px",
+                            display: "flex",
+                            flexDirection: "column",
+                            justifyContent: "center"
+                        }}>
+                            <div style={{fontSize: "20px", fontWeight: "bold"}}>
+                                {winner
+                                    ? (winner === 1 ? "You Win!" : "AI Wins!")
+                                    : thinking
+                                        ? "Thinking..."
+                                        : "Your Turn"
+                                }
                             </div>
-                        )}
+                            {message && !winner && (
+                                <div style={{fontSize: "12px", opacity: 0.9, marginTop: "4px"}}>
+                                    {message}
+                                </div>
+                            )}
+                        </div>
+
+                        <div style={{
+                            display: "flex",
+                            justifyContent: "space-around",
+                            marginTop: "12px"
+                        }}>
+                            <div style={{textAlign: "center"}}>
+                                <div style={{fontSize: "20px", fontWeight: "bold", color: "white"}}>
+                                    {moveCount}
+                                </div>
+                                <div style={{fontSize: "11px", color: "rgba(255,255,255,0.6)"}}>Moves</div>
+                            </div>
+                            <div style={{textAlign: "center"}}>
+                                <div style={{fontSize: "20px", fontWeight: "bold", color: "white"}}>
+                                    300
+                                </div>
+                                <div style={{fontSize: "11px", color: "rgba(255,255,255,0.6)"}}>Sims</div>
+                            </div>
+                        </div>
                     </div>
-
-
-
-                    {/* Move Counter */}
-                    <div style={{
-                        display: "flex",
-                        justifyContent: "space-around",
-                        marginBottom: "20px",
-                        padding: "12px",
-                        background: "#f8f9fa",
-                        borderRadius: "8px"
-                    }}>
-                        <div style={{textAlign: "center"}}>
-                            <div style={{fontSize: "24px", fontWeight: "bold", color: "#333"}}>
-                                {moveCount}
-                            </div>
-                            <div style={{fontSize: "12px", color: "#666"}}>Moves</div>
-                        </div>
-                        <div style={{textAlign: "center"}}>
-                            <div style={{fontSize: "24px", fontWeight: "bold", color: "#333"}}>
-                                300
-                            </div>
-                            <div style={{fontSize: "12px", color: "#666"}}>Simulations</div>
-                        </div>
-                    </div>
-
-
 
                     {/* AI Info */}
                     {aiInfo && (
                         <div style={{
-                            background: "#f8f9fa",
-                            borderRadius: "8px",
+                            background: "rgba(255,255,255,0.1)",
+                            borderRadius: "12px",
                             padding: "16px",
-                            marginBottom: "20px"
+                            backdropFilter: "blur(10px)"
                         }}>
                             <div style={{
-                                fontSize: "14px",
-                                fontWeight: "600",
-                                color: "#333",
+                                fontSize: "12px",
+                                color: "rgba(255,255,255,0.6)",
                                 marginBottom: "12px",
-                                borderBottom: "1px solid #e0e0e0",
-                                paddingBottom: "8px"
+                                textTransform: "uppercase",
+                                letterSpacing: "1px"
                             }}>
-                                AI Info
+                                AI Decision
                             </div>
-                            <div style={{fontSize: "13px", color: "#555"}}>
-                                <div style={{marginBottom: "8px"}}>
-                                    <span style={{color: "#888"}}>Type: </span>
+                            <div style={{fontSize: "13px", color: "white"}}>
+                                <div style={{marginBottom: "6px"}}>
+                                    <span style={{opacity: 0.6}}>Type: </span>
                                     <span style={{
                                         background: aiInfo.type === "mcts" ? "#4CAF50" : aiInfo.type === "win" ? "#FF9800" : "#2196F3",
-                                        color: "white",
                                         padding: "2px 8px",
                                         borderRadius: "4px",
-                                        fontSize: "12px"
+                                        fontSize: "11px"
                                     }}>
                                         {aiInfo.type || "N/A"}
                                     </span>
                                 </div>
                                 {aiInfo.move && (
-                                    <div style={{marginBottom: "8px"}}>
-                                        <span style={{color: "#888"}}>Position: </span>
-                                        <span style={{fontWeight: "500"}}>
-                                            ({aiInfo.move.join(", ")})
-                                        </span>
-                                    </div>
-                                )}
-                                {aiInfo.simulations && (
                                     <div>
-                                        <span style={{color: "#888"}}>Sims: </span>
-                                        <span style={{fontWeight: "500"}}>
-                                            {aiInfo.simulations}
-                                        </span>
+                                        <span style={{opacity: 0.6}}>Position: </span>
+                                        <span>({aiInfo.move.join(", ")})</span>
                                     </div>
                                 )}
                             </div>
                         </div>
                     )}
 
-
-
-                    {/* Restart Button */}
-                    <button
-                        onClick={() => setShowNewGame(true)}
-                        style={{
-                            width: "100%",
-                            padding: "14px",
-                            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                            color: "white",
-                            border: "none",
-                            borderRadius: "8px",
-                            fontSize: "16px",
-                            fontWeight: "600",
-                            cursor: "pointer",
-                            transition: "transform 0.2s, box-shadow 0.2s",
-                            boxShadow: "0 4px 15px rgba(102, 126, 234, 0.4)"
-                        }}
-                        onMouseOver={(e) => {
-                            e.target.style.transform = "translateY(-2px)";
-                            e.target.style.boxShadow = "0 6px 20px rgba(102, 126, 234, 0.6)";
-                        }}
-                        onMouseOut={(e) => {
-                            e.target.style.transform = "translateY(0)";
-                            e.target.style.boxShadow = "0 4px 15px rgba(102, 126, 234, 0.4)";
-                        }}
-                    >
-                        New Game
-                    </button>
-
-
-                    {/* Export Button */}
-                    <button
-                        onClick={handleExport}
-                        style={{
-                            width: "100%",
-                            padding: "12px",
-                            background: "linear-gradient(135deg, #11998e 0%, #38ef7d 100%)",
-                            color: "white",
-                            border: "none",
-                            borderRadius: "8px",
-                            fontSize: "14px",
-                            fontWeight: "600",
-                            cursor: "pointer",
-                            marginTop: "10px",
-                            transition: "transform 0.2s"
-                        }}
-                    >
-                        Export Game
-                    </button>
-
-
-                    {/* Self Play Button */}
-                    <button
-                        onClick={() => setShowTraining(true)}
-                        style={{
-                            width: "100%",
-                            padding: "12px",
-                            background: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
-                            color: "white",
-                            border: "none",
-                            borderRadius: "8px",
-                            fontSize: "14px",
-                            fontWeight: "600",
-                            cursor: "pointer",
-                            marginTop: "10px",
-                            transition: "transform 0.2s"
-                        }}
-                    >
-                        AI Training
-                    </button>
-
-
-                    {/* Monitor Toggle Button */}
-                    <button
-                        onClick={showMonitor ? stopMonitor : startMonitor}
-                        style={{
-                            width: "100%",
-                            padding: "12px",
-                            background: showMonitor
-                                ? "linear-gradient(135deg, #f44336, #e91e63)"
-                                : "linear-gradient(135deg, #00b09b, #96c93d)",
-                            color: "white",
-                            border: "none",
-                            borderRadius: "8px",
-                            fontSize: "14px",
-                            fontWeight: "600",
-                            cursor: "pointer",
-                            marginTop: "10px",
-                            transition: "transform 0.2s"
-                        }}
-                    >
-                        {showMonitor ? "Stop Monitor" : "Start Monitor"}
-                    </button>
-
-
-                    {/* Game Info */}
-                    {gameInfo && (
-                        <div style={{
-                            marginTop: "12px",
-                            padding: "10px",
-                            background: "#e8f5e9",
-                            borderRadius: "8px",
-                            fontSize: "12px",
-                            color: "#2e7d32"
-                        }}>
-                            <div>Board: {gameInfo.size}x{gameInfo.size}</div>
-                            <div>Difficulty: {gameInfo.difficulty}</div>
-                            <div>Simulations: {gameInfo.simulations}</div>
-                        </div>
-                    )}
-
-
-
-                    {/* Legend */}
+                    {/* Chat */}
                     <div style={{
-                        marginTop: "20px",
-                        padding: "12px",
-                        background: "#f8f9fa",
-                        borderRadius: "8px",
-                        fontSize: "12px",
-                        color: "#666"
-                    }}>
-                        <div style={{marginBottom: "8px", fontWeight: "600", color: "#333"}}>Legend</div>
-                        <div style={{display: "flex", alignItems: "center", marginBottom: "6px"}}>
-                            <div style={{
-                                width: "16px", height: "16px", borderRadius: "50%",
-                                background: "black", marginRight: "8px", border: "1px solid #333"
-                            }}></div>
-                            <span>You (Black)</span>
-                        </div>
-                        <div style={{display: "flex", alignItems: "center", marginBottom: "6px"}}>
-                            <div style={{
-                                width: "16px", height: "16px", borderRadius: "50%",
-                                background: "white", marginRight: "8px", border: "1px solid #999"
-                            }}></div>
-                            <span>AI (White)</span>
-                        </div>
-                        <div style={{display: "flex", alignItems: "center"}}>
-                            <div style={{
-                                width: "16px", height: "16px", borderRadius: "50%",
-                                background: "transparent", marginRight: "8px",
-                                border: "3px solid #FF4444"
-                            }}></div>
-                            <span>Winning Line</span>
-                        </div>
-                    </div>
-
-                </div>
-
-
-                {/* Chat Panel */}
-                <div style={{
-                    background: "rgba(255,255,255,0.95)",
-                    borderRadius: "16px",
-                    padding: "24px",
-                    width: "320px",
-                    boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
-                    backdropFilter: "blur(10px)",
-                    display: "flex",
-                    flexDirection: "column",
-                    height: "500px"
-                }}>
-
-                    {/* Chat Header */}
-                    <div style={{
-                        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                        background: "rgba(255,255,255,0.1)",
                         borderRadius: "12px",
                         padding: "16px",
-                        marginBottom: "16px",
-                        color: "white"
-                    }}>
-                        <div style={{fontSize: "18px", fontWeight: "600"}}>
-                            Chat with AI
-                        </div>
-                        <div style={{fontSize: "12px", opacity: 0.9, marginTop: "4px"}}>
-                            Ask about AI's thinking
-                        </div>
-                    </div>
-
-
-                    {/* Messages */}
-                    <div style={{
-                        flex: 1,
-                        overflowY: "auto",
-                        marginBottom: "12px",
-                        padding: "8px",
-                        background: "#f8f9fa",
-                        borderRadius: "8px"
-                    }}>
-                        {chatMessages.length === 0 && (
-                            <div style={{
-                                textAlign: "center",
-                                color: "#999",
-                                padding: "20px",
-                                fontSize: "14px"
-                            }}>
-                                Ask me anything about my moves!
-                            </div>
-                        )}
-
-                        {chatMessages.map((msg, idx) => (
-                            <div key={idx} style={{
-                                marginBottom: "12px",
-                                display: "flex",
-                                justifyContent: msg.role === "user" ? "flex-end" : "flex-start"
-                            }}>
-                                <div style={{
-                                    maxWidth: "80%",
-                                    padding: "10px 14px",
-                                    borderRadius: msg.role === "user"
-                                        ? "12px 12px 0 12px"
-                                        : "12px 12px 12px 0",
-                                    background: msg.role === "user"
-                                        ? "linear-gradient(135deg, #667eea, #764ba2)"
-                                        : "white",
-                                    color: msg.role === "user" ? "white" : "#333",
-                                    fontSize: "14px",
-                                    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                                    whiteSpace: "pre-wrap"
-                                }}>
-                                    {msg.content}
-                                </div>
-                            </div>
-                        ))}
-
-                        {chatLoading && (
-                            <div style={{
-                                textAlign: "left",
-                                marginBottom: "12px"
-                            }}>
-                                <div style={{
-                                    display: "inline-block",
-                                    padding: "10px 14px",
-                                    borderRadius: "12px 12px 12px 0",
-                                    background: "white",
-                                    boxShadow: "0 2px 8px rgba(0,0,0,0.1)"
-                                }}>
-                                    <span style={{animation: "pulse 1s infinite"}}>Thinking...</span>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Scroll anchor */}
-                        <div ref={chatEndRef} />
-                    </div>
-
-
-                    {/* Input */}
-                    <div style={{
-                        display: "flex",
-                        gap: "8px"
-                    }}>
-                        <input
-                            type="text"
-                            value={chatInput}
-                            onChange={(e) => setChatInput(e.target.value)}
-                            onKeyPress={(e) => e.key === "Enter" && sendChat()}
-                            placeholder="Ask AI..."
-                            style={{
-                                flex: 1,
-                                padding: "12px",
-                                borderRadius: "8px",
-                                border: "1px solid #ddd",
-                                fontSize: "14px",
-                                outline: "none"
-                            }}
-                        />
-                        <button
-                            onClick={sendChat}
-                            disabled={chatLoading || !chatInput.trim()}
-                            style={{
-                                padding: "12px 16px",
-                                background: chatLoading || !chatInput.trim()
-                                    ? "#ccc"
-                                    : "linear-gradient(135deg, #667eea, #764ba2)",
-                                color: "white",
-                                border: "none",
-                                borderRadius: "8px",
-                                cursor: chatLoading || !chatInput.trim() ? "not-allowed" : "pointer",
-                                fontSize: "14px"
-                            }}
-                        >
-                            Send
-                        </button>
-                    </div>
-
-                </div>
-
-
-                {/* Monitor Panel */}
-                {showMonitor && monitorData && (
-                    <div style={{
-                        background: "rgba(255,255,255,0.95)",
-                        borderRadius: "16px",
-                        padding: "24px",
-                        width: "320px",
-                        boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
                         backdropFilter: "blur(10px)",
+                        flex: 1,
                         display: "flex",
                         flexDirection: "column",
-                        height: "500px"
+                        minHeight: "300px"
                     }}>
-
-                        {/* Monitor Header */}
                         <div style={{
-                            background: "linear-gradient(135deg, #00b09b 0%, #96c93d 100%)",
-                            borderRadius: "12px",
-                            padding: "16px",
-                            marginBottom: "16px",
-                            color: "white"
+                            fontSize: "12px",
+                            color: "rgba(255,255,255,0.6)",
+                            marginBottom: "12px",
+                            textTransform: "uppercase",
+                            letterSpacing: "1px"
                         }}>
-                            <div style={{fontSize: "18px", fontWeight: "600"}}>
-                                AI Monitor
-                            </div>
-                            <div style={{fontSize: "12px", opacity: 0.9, marginTop: "4px"}}>
-                                Real-time AI thinking process
-                            </div>
+                            Chat with AI
                         </div>
 
-
-                        {/* Monitor Content */}
+                        {/* Messages */}
                         <div style={{
                             flex: 1,
                             overflowY: "auto",
-                            fontSize: "13px"
+                            marginBottom: "12px",
+                            padding: "8px",
+                            background: "rgba(0,0,0,0.2)",
+                            borderRadius: "8px"
                         }}>
-                            {/* Game Status */}
-                            <div style={{
-                                marginBottom: "16px",
-                                padding: "12px",
-                                background: monitorData.game_over ? "#ffebee" : "#e8f5e9",
-                                borderRadius: "8px"
-                            }}>
-                                <div style={{fontWeight: "600", marginBottom: "8px"}}>
-                                    Game Status
-                                </div>
-                                <div>Status: {monitorData.game_over ? "Game Over" : "Playing"}</div>
-                                <div>Current Player: {monitorData.current_player}</div>
-                                <div>Moves: {monitorData.move_count}</div>
-                                {monitorData.opening && (
-                                    <div>Opening: {monitorData.opening}</div>
-                                )}
-                            </div>
-
-
-                            {/* Score Analysis */}
-                            <div style={{
-                                marginBottom: "16px",
-                                padding: "12px",
-                                background: "#f5f5f5",
-                                borderRadius: "8px"
-                            }}>
-                                <div style={{fontWeight: "600", marginBottom: "8px"}}>
-                                    Score Analysis
-                                </div>
-                                <div>Current Score: {monitorData.scores.current}</div>
-                                <div>Opponent Score: {monitorData.scores.opponent}</div>
-                                <div>Situation: {monitorData.situation}</div>
-                            </div>
-
-
-                            {/* AI Decision */}
-                            {monitorData.ai_decision && monitorData.ai_decision.strategy && (
+                            {chatMessages.length === 0 && (
                                 <div style={{
-                                    marginBottom: "16px",
-                                    padding: "12px",
-                                    background: "#e3f2fd",
-                                    borderRadius: "8px"
+                                    textAlign: "center",
+                                    color: "rgba(255,255,255,0.4)",
+                                    padding: "20px",
+                                    fontSize: "12px"
                                 }}>
-                                    <div style={{fontWeight: "600", marginBottom: "8px"}}>
-                                        AI Thinking
-                                    </div>
-                                    <div>Style: {monitorData.ai_decision.strategy.style}</div>
-                                    <div>Priority: {monitorData.ai_decision.strategy.priority}</div>
-                                    {monitorData.ai_decision.strategy.reason && (
-                                        <div>Reason: {monitorData.ai_decision.strategy.reason}</div>
-                                    )}
+                                    Ask me about my moves!
                                 </div>
                             )}
 
-
-                            {/* Last Move */}
-                            {monitorData.last_move && (
-                                <div style={{
-                                    marginBottom: "16px",
-                                    padding: "12px",
-                                    background: "#fff3e0",
-                                    borderRadius: "8px"
+                            {chatMessages.map((msg, idx) => (
+                                <div key={idx} style={{
+                                    marginBottom: "8px",
+                                    display: "flex",
+                                    justifyContent: msg.role === "user" ? "flex-end" : "flex-start"
                                 }}>
-                                    <div style={{fontWeight: "600", marginBottom: "8px"}}>
-                                        Last Move
+                                    <div style={{
+                                        maxWidth: "85%",
+                                        padding: "8px 12px",
+                                        borderRadius: msg.role === "user"
+                                            ? "10px 10px 0 10px"
+                                            : "10px 10px 10px 0",
+                                        background: msg.role === "user"
+                                            ? "linear-gradient(135deg, #667eea, #764ba2)"
+                                            : "rgba(255,255,255,0.2)",
+                                        color: "white",
+                                        fontSize: "12px",
+                                        whiteSpace: "pre-wrap"
+                                    }}>
+                                        {msg.content}
                                     </div>
-                                    <div>Position: ({monitorData.last_move.x}, {monitorData.last_move.y})</div>
-                                    <div>Player: {monitorData.last_move.player === 1 ? "Black" : "White"}</div>
+                                </div>
+                            ))}
+
+                            {chatLoading && (
+                                <div style={{textAlign: "left", marginBottom: "8px"}}>
+                                    <div style={{
+                                        display: "inline-block",
+                                        padding: "8px 12px",
+                                        borderRadius: "10px 10px 10px 0",
+                                        background: "rgba(255,255,255,0.2)",
+                                        color: "white",
+                                        fontSize: "12px"
+                                    }}>
+                                        Thinking...
+                                    </div>
                                 </div>
                             )}
 
-
-                            {/* Memory Stats */}
-                            <div style={{
-                                padding: "12px",
-                                background: "#f3e5f5",
-                                borderRadius: "8px"
-                            }}>
-                                <div style={{fontWeight: "600", marginBottom: "8px"}}>
-                                    Memory Stats
-                                </div>
-                                <div>Saved Games: {monitorData.memory_count}</div>
-                            </div>
+                            <div ref={chatEndRef} />
                         </div>
 
+                        {/* Input */}
+                        <div style={{display: "flex", gap: "8px"}}>
+                            <input
+                                type="text"
+                                value={chatInput}
+                                onChange={(e) => setChatInput(e.target.value)}
+                                onKeyPress={(e) => e.key === "Enter" && sendChat()}
+                                placeholder="Ask AI..."
+                                style={{
+                                    flex: 1,
+                                    padding: "10px",
+                                    borderRadius: "8px",
+                                    border: "1px solid rgba(255,255,255,0.2)",
+                                    background: "rgba(0,0,0,0.2)",
+                                    color: "white",
+                                    fontSize: "12px",
+                                    outline: "none"
+                                }}
+                            />
+                            <button
+                                onClick={sendChat}
+                                disabled={chatLoading || !chatInput.trim()}
+                                style={{
+                                    padding: "10px 14px",
+                                    background: chatLoading || !chatInput.trim()
+                                        ? "rgba(255,255,255,0.2)"
+                                        : "linear-gradient(135deg, #667eea, #764ba2)",
+                                    color: "white",
+                                    border: "none",
+                                    borderRadius: "8px",
+                                    cursor: chatLoading || !chatInput.trim() ? "not-allowed" : "pointer",
+                                    fontSize: "12px"
+                                }}
+                            >
+                                Send
+                            </button>
+                        </div>
                     </div>
-                )}
+                </div>
 
             </div>
 
